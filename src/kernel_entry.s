@@ -17,3 +17,20 @@ _start:
     cli
     hlt
     jmp .hang
+; Flush GDT
+global gdt_flush
+gdt_flush:
+    mov eax, [esp + 4]
+    lgdt [eax]
+
+    ; Reload segment registers
+    mov ax, 0x10     ; Data segment (index 2 in GDT)
+    mov ds, ax
+    mov es, ax
+    mov fs, ax
+    mov gs, ax
+    mov ss, ax
+
+    jmp 0x08:.flush_done  ; Code segment (index 1 in GDT)
+.flush_done:
+    ret
