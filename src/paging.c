@@ -1,11 +1,7 @@
 #include <stdint.h>
-
+#include "kheap.h"
 #define PAGE_SIZE       0x1000      // 4 KB
 #define PAGE_ENTRIES    1024
-
-// Heap range
-#define KERNEL_HEAP_START 0x1000000 // 16 MB
-#define KERNEL_HEAP_SIZE  0x100000  // 1 MB
 
 // Page tables and directory
 uint32_t page_directory[PAGE_ENTRIES]    __attribute__((aligned(PAGE_SIZE)));
@@ -30,18 +26,18 @@ void init_paging() {
     // -------------------------------
     // Build page directory
     // -------------------------------
-
+    
+    // Clear 
+    for (uint32_t i = 0; i < PAGE_ENTRIES; ++i) {
+        page_directory[i] = 0;
+    }
     // First entry: 0–4MB
     page_directory[0] = ((uint32_t)first_page_table) | 3;
 
     // Heap entry: 16–20MB → 16MB / 4MB = index 4
     page_directory[4] = ((uint32_t)heap_page_table) | 3;
 
-    // Clear others
-    for (uint32_t i = 1; i < PAGE_ENTRIES; ++i) {
-        if (i != 4) page_directory[i] = 0;
-    }
-
+   
     // -------------------------------
     // Load CR3 with page directory, enable PG in CR0
     // -------------------------------
