@@ -1,4 +1,5 @@
 unset GTK_PATH
+rm  bin/*.o BatOS.iso iso/boot/kernel.elf
 gcc -m32 -ffreestanding -c src/kernel.c -o bin/kernel.o
 gcc -m32 -ffreestanding -c src/gdt.c -o bin/gdt.o
 gcc -m32 -ffreestanding -c src/paging.c -o bin/paging.o

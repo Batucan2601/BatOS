@@ -1,20 +1,25 @@
 [bits 32]
+
 global isr_stubs
-global isr_stub_table
 extern isr_handler
 
-isr_stubs:
-isr_stub_table:
+section .text
 
+isr_stubs:
 %assign i 0
 %rep 32
-    isr_stub_%+i:
+    %define stub isr_stub_%+i
+    global stub         ; 🔥 make stub visible to C
+    stub:
         cli
-        push dword i        ; Push interrupt number
+        push 0
+        push dword i
+        pusha
         call isr_handler
-        add esp, 4          ; Clean up pushed interrupt number
+        add esp, 8
+        popa
         sti
         iret
-    dd isr_stub_%+i
+    dd stub             ; 🔥 add to isr_stubs[]
 %assign i i+1
 %endrep
