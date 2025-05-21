@@ -8,6 +8,8 @@
 static uint16_t* vga_buffer = (uint16_t*)VGA_ADDRESS;
 static uint8_t cursor_row = 0;
 static uint8_t cursor_col = 0;
+static uint8_t cursor_x = 0;
+static uint8_t cursor_y = 0;
 
 static void put_entry_at(char c, uint8_t color, uint8_t x, uint8_t y) {
     const uint32_t index = y * VGA_WIDTH + x;
@@ -46,4 +48,46 @@ void print_hex(uint32_t value) {
     for (int i = 28; i >= 0; i -= 4) {
         print_char(hex[(value >> i) & 0xF]);
     }
+}
+
+void move_cursor() {
+    uint16_t pos = cursor_y * VGA_WIDTH + cursor_x;
+    outb(0x3D4, 0x0F);
+    outb(0x3D5, (uint8_t)(pos & 0xFF));
+    outb(0x3D4, 0x0E);
+    outb(0x3D5, (uint8_t)((pos >> 8) & 0xFF));
+}
+
+void vga_newkey(uint8_t c) {
+    if (c == '\n') {
+        cursor_y++;
+        cursor_x = 0;
+    } else {
+        vga_buffer[cursor_y * VGA_WIDTH + cursor_x] = (WHITE_ON_BLACK << 8) | c;
+        cursor_x++;
+        if (cursor_x >= VGA_WIDTH) {
+            cursor_x = 0;
+            cursor_y++;
+        }
+    }
+
+    if (cursor_y >= VGA_HEIGHT) {
+        cursor_y = 0;
+    }
+
+    move_cursor();
+}
+
+void vga_backspace() {
+    if (cursor_x == 0 && cursor_y == 0)
+        return;
+
+    if (cursor_x == 0) {
+        cursor_y--;
+        cursor_x = VGA_WIDTH - 1;
+    } else {
+        cursor_x--;
+    }
+    vga_buffer[cursor_y * VGA_WIDTH + cursor_x] = ' ' | (0x07 << 8);  // clear char
+    move_cursor();
 }

@@ -10,12 +10,14 @@ gcc -m32 -ffreestanding -c src/idt.c -o bin/idt.o
 gcc -m32 -ffreestanding -c src/PIC.c -o bin/PIC.o
 gcc -m32 -ffreestanding -c src/ports.c -o bin/ports.o
 gcc -m32 -ffreestanding -c src/pit.c -o bin/pit.o
+gcc -m32 -ffreestanding -c src/keyboard.c -o bin/keyboard.o
+
 
 nasm -f elf32 src/kernel_entry.s -o bin/kernel_entry.o
 nasm -f elf32 src/idt_flush.s -o bin/idt_flush.o
 nasm -f elf32 src/isr_stubs.s -o bin/isr_stubs.o
 
-ld -m elf_i386 -T link.ld -o bin/kernel.elf bin/kernel_entry.o bin/isr_stubs.o bin/idt_flush.o bin/kernel.o bin/gdt.o bin/paging.o bin/kheap.o bin/vga.o bin/isr.o bin/idt.o  bin/PIC.o bin/ports.o bin/pit.o -o bin/kernel.elf 
+ld -m elf_i386 -T link.ld -o bin/kernel.elf bin/kernel_entry.o bin/isr_stubs.o bin/idt_flush.o bin/kernel.o bin/gdt.o bin/paging.o bin/kheap.o bin/vga.o bin/isr.o bin/idt.o  bin/PIC.o bin/ports.o bin/pit.o  bin/keyboard.o -o bin/kernel.elf 
 
 cp bin/kernel.elf iso/boot/kernel.elf
 grub-mkrescue -o BatOS.iso iso
