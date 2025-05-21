@@ -7,19 +7,19 @@ section .text
 
 isr_stubs:
 %assign i 0
-%rep 32
+%rep 48               ; 0–31 = ISRs, 32–47 = IRQs
     %define stub isr_stub_%+i
-    global stub         ; 🔥 make stub visible to C
+    global stub
     stub:
         cli
-        push 0
-        push dword i
-        pusha
+        pusha                      ; save all general purpose registers
+        push dword 0               ; push error code
+        push dword i              ; push interrupt number
         call isr_handler
-        add esp, 8
-        popa
+        add esp, 8                 ; clean up args
+        popa                       ; restore registers
         sti
         iret
-    dd stub             ; 🔥 add to isr_stubs[]
+    dd stub
 %assign i i+1
 %endrep

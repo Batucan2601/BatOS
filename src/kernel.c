@@ -1,12 +1,24 @@
 #include "kheap.h"
 #include "idt.h"
 #include "vga.h"
+#include "PIC.h"
+#include "ports.h"
+#include "pit.h"
 
 void kernel_main() {
+      __asm__ volatile("cli");
+   print("hello kernel\n");
    init_gdt();
-   init_idt(); // contains set_idt_gate(0, (uint32_t)isr_stub_0)
-   print("About to trigger INT 0\n");
-   int a = 1 /0 ;
-   //__asm__ volatile ("int $0");
-   //print("Should never reach here\n");
+   init_paging();
+   init_idt();
+   pic_remap();
+   init_pit(100);
+   outb(0x21, 0xFE);
+   outb(0xA1, 0xFF);
+   __asm__ volatile("sti");
+   
+   while(1)
+   __asm__ volatile("hlt");
+
 }
+

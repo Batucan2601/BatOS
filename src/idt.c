@@ -33,9 +33,28 @@ extern void isr_stub_28(); // ← Declare this
 extern void isr_stub_29(); // ← Declare this
 extern void isr_stub_30(); // ← Declare this
 extern void isr_stub_31(); // ← Declare this
+extern void isr_stub_32(); // ← Declare this
+extern void isr_stub_33(); // ← Declare this
+extern void isr_stub_34(); // ← Declare this
+extern void isr_stub_35(); // ← Declare this
+extern void isr_stub_36(); // ← Declare this
+extern void isr_stub_37(); // ← Declare this
+extern void isr_stub_38(); // ← Declare this
+extern void isr_stub_39(); // ← Declare this
+extern void isr_stub_40(); // ← Declare this
+extern void isr_stub_41(); // ← Declare this
+extern void isr_stub_42(); // ← Declare this
+extern void isr_stub_43(); // ← Declare this
+extern void isr_stub_44(); // ← Declare this
+extern void isr_stub_45(); // ← Declare this
+extern void isr_stub_46(); // ← Declare this
+extern void isr_stub_47(); // ← Declare this
+extern void isr_stub_48(); // ← Declare this
 
 idt_entry_t idt[IDT_ENTRIES];
 idt_ptr_t idtp;
+extern void* isr_stubs[];
+
 
 void set_idt_gate(int n, uint32_t handler) {
     idt[n].base_low = handler & 0xFFFF;
@@ -82,9 +101,23 @@ void init_idt() {
     set_idt_gate(29, (uint32_t)isr_stub_29);
     set_idt_gate(30, (uint32_t)isr_stub_30);
     set_idt_gate(31, (uint32_t)isr_stub_31);
-
+    set_idt_gate(32, (uint32_t)isr_stub_32);
+    set_idt_gate(33, (uint32_t)isr_stub_33);
+    set_idt_gate(34, (uint32_t)isr_stub_34);
+    set_idt_gate(35, (uint32_t)isr_stub_35);
+    set_idt_gate(36, (uint32_t)isr_stub_36);
+    set_idt_gate(37, (uint32_t)isr_stub_37);
+    set_idt_gate(38, (uint32_t)isr_stub_38);
+    set_idt_gate(39, (uint32_t)isr_stub_39);
+    set_idt_gate(40, (uint32_t)isr_stub_40);
+    set_idt_gate(41, (uint32_t)isr_stub_41);
+    set_idt_gate(42, (uint32_t)isr_stub_42);
+    set_idt_gate(43, (uint32_t)isr_stub_43);
+    set_idt_gate(44, (uint32_t)isr_stub_44);
+    set_idt_gate(45, (uint32_t)isr_stub_45);
+    set_idt_gate(46, (uint32_t)isr_stub_46);
+    set_idt_gate(47, (uint32_t)isr_stub_47);
 
    
-
     idt_flush((uint32_t)&idtp);
 }

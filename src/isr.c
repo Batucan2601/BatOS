@@ -36,18 +36,37 @@ static const char* exception_messages[32] = {
     "Reserved"
 };
 
+static int ticks = 0; 
+void irq_handler(uint32_t int_no) {
+    if (int_no == 32) {
+        print(".");
+        // No printing inside interrupts for now!
+    }
+
+    // Send End of Interrupt (EOI)
+    if (int_no >= 40) outb(0xA0, 0x20);  // Slave PIC
+    outb(0x20, 0x20);                    // Master PIC
+}
+
+
 void isr_handler(uint32_t int_no, uint32_t err_code) {
-    print("\nEXCEPTION: ");
+
+    if (int_no >= 32 && int_no <= 47) {
+        irq_handler(int_no);
+        return;  // ✅ RETURN — do not halt
+    }
+    print("\nISR fired!\nInterrupt number: ");
+    print_hex(int_no);
+    print("\nError code: ");
+    print_hex(err_code);
+    print(" (Exception)\n");
+
     if (int_no < 32)
         print(exception_messages[int_no]);
     else
-        print("Unknown exception");
+        print("Unknown");
 
-    print("\nInterrupt number: ");
-    print_hex(int_no);
+    print("\nSystem halted due to exception.\n");
 
-    print("\nError code: ");
-    print_hex(err_code);
-
-    while (1) __asm__("hlt");
+    while (1) __asm__("hlt");  // ❌ Only here!
 }
