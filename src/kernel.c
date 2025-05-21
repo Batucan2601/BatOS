@@ -15,6 +15,9 @@ void kernel_main() {
    init_pit(100);
    outb(0x21, 0xFE);
    outb(0xA1, 0xFF);
+   
+   outb(0x21, inb(0x21) & ~0x02);  // Unmask IRQ1 (bit 1 = 0)
+
    __asm__ volatile("sti");
    
    while(1)
