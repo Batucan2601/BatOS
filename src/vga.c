@@ -4,10 +4,9 @@
 #define VGA_WIDTH 80
 #define VGA_HEIGHT 25
 #define WHITE_ON_BLACK 0x0F
+#define LIGHT_BLUE_ON_BLACK 0x09
 
 static uint16_t* vga_buffer = (uint16_t*)VGA_ADDRESS;
-static uint8_t cursor_row = 0;
-static uint8_t cursor_col = 0;
 static uint8_t cursor_x = 0;
 static uint8_t cursor_y = 0;
 
@@ -18,24 +17,45 @@ static void put_entry_at(char c, uint8_t color, uint8_t x, uint8_t y) {
 
 void print_char(char c) {
     if (c == '\n') {
-        cursor_row++;
-        cursor_col = 0;
+        cursor_y++;
+        cursor_x = 0;
         return;
     }
 
-    put_entry_at(c, WHITE_ON_BLACK, cursor_col, cursor_row);
-    cursor_col++;
+    put_entry_at(c, WHITE_ON_BLACK, cursor_x, cursor_y);
+    cursor_x++;
 
-    if (cursor_col >= VGA_WIDTH) {
-        cursor_col = 0;
-        cursor_row++;
+    if (cursor_x >= VGA_WIDTH) {
+        cursor_x = 0;
+        cursor_y++;
     }
 
-    if (cursor_row >= VGA_HEIGHT) {
-        cursor_row = 0;
+    if (cursor_y >= VGA_HEIGHT) {
+        cursor_y = 0;
     }
 }
+vga_write_directory(char* str)
+{
+    for (uint32_t i = 0; str[i] != '\0'; ++i) 
+    {
+        put_entry_at(str[i], LIGHT_BLUE_ON_BLACK, cursor_x, cursor_y);
+        cursor_x++;
+        if (cursor_x >= VGA_WIDTH) {
+            cursor_x = 0;
+            cursor_y++;
+        }
+        if (cursor_y >= VGA_HEIGHT) 
+        {
+            cursor_y = 0;
+        }
+        
+    }
+    put_entry_at(':', LIGHT_BLUE_ON_BLACK, cursor_x, cursor_y);
+    cursor_x++;
+    // this is for aesthethic reasons
+    cursor_x++;
 
+}
 void print(const char* str) {
     for (uint32_t i = 0; str[i] != '\0'; ++i) {
         print_char(str[i]);

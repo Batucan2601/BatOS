@@ -4,6 +4,10 @@
         "kheap.h": "c",
         "idt.h": "c",
         "ports.h": "c",
-        "pic.h": "c"
+        "pic.h": "c",
+        "filesystem.h": "c",
+        "vga.h": "c",
+        "stringcustom.h": "c",
+        "filesystemcommands.h": "c"
     }
 }
