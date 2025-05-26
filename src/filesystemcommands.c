@@ -16,12 +16,12 @@ void ls()
 {
     FileSystem* fs = fs_get();
     Node* current_dir = fs->current_dir;
-
-    for (int i = 0; i < current_dir->child_count; i++) {
-        print("file name === ");
+    for (size_t i = 0; i < current_dir->child_count; i++)
+    {
         print(current_dir->children[i]->name);
-        print("\n");
+        print(" ");
     }
+    print("\n");
 }
 
 void cd(char* path)
@@ -58,7 +58,6 @@ void mkdir(char* name)
         new_dir->parent = current_dir;
         new_dir->child_count = 0;
         current_dir->children[current_dir->child_count++] = new_dir;
-        print(new_dir->name);
     }
 }
 void touch(char* name)
@@ -117,12 +116,16 @@ void show_directory()
 
 void execute_command(char* command)
 {
+    uint8_t is_command = 0;
+    // Remove leading and trailing whitespace
+    while (*command == ' ') command++;    
     for (size_t i = 0; i < COMMANDS_COUNT; i++)
     {
         size_t cmd_len = strlen(commands[i]);
         if (strncmp(command, commands[i], cmd_len) == 0 && 
             (command[cmd_len] == ' ' || command[cmd_len] == '\0'))
         {
+            is_command = 1; 
             // Pointer to argument after command
             char* arg = NULL;
             if (command[cmd_len] == ' ')
@@ -150,6 +153,10 @@ void execute_command(char* command)
             }
             break;
         }
+    }
+    if( is_command == 0 )
+    {
+        print("Command not found\n");
     }
     show_directory();
 }

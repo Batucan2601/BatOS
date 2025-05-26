@@ -8,6 +8,10 @@
         "filesystem.h": "c",
         "vga.h": "c",
         "stringcustom.h": "c",
-        "filesystemcommands.h": "c"
+        "filesystemcommands.h": "c",
+        "stddef.h": "c",
+        "memory.h": "c",
+        "fs_disk.h": "c",
+        "ide.h": "c"
     }
 }
