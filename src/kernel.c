@@ -12,7 +12,7 @@
 
 
 void kernel_main() {
-      __asm__ volatile("cli");
+   __asm__ volatile("cli");
    print("hello kernel\n");
    init_gdt();
    init_paging();
@@ -20,9 +20,12 @@ void kernel_main() {
    pic_remap();
    init_pit(100);
    keyboard_init();
-   fs_disk_init();
-   //write_fake_disk_table(); // Write the fake disk table to sector 1
+   print("Keyboard initialized\n");
    fs_init();
+   print("fs init \n");
+   fs_disk_init();
+   print("fs disk \n");
+
    show_directory();
 
    // irq stuff
@@ -32,7 +35,7 @@ void kernel_main() {
    outb(0x21, inb(0x21) & ~0x02);  // Unmask IRQ1 (bit 1 = 0)
    __asm__ volatile("sti");
    
-       uint8_t buffer[512];
+    uint8_t buffer[512];
     ide_read_sector(0, buffer);
 
     print("First 16 bytes of sector 0:\n");

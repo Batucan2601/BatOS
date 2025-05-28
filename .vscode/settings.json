@@ -12,6 +12,7 @@
         "stddef.h": "c",
         "memory.h": "c",
         "fs_disk.h": "c",
-        "ide.h": "c"
+        "ide.h": "c",
+        "cstdint": "c"
     }
 }

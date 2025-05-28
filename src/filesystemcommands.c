@@ -15,32 +15,34 @@ char* commands[] = {
 void ls()
 {
     FileSystem* fs = fs_get();
-    Node* current_dir = fs->current_dir;
+    Node* current_dir = &fs->file_nodes[fs->current_dir];
     for (size_t i = 0; i < current_dir->child_count; i++)
     {
-        print(current_dir->children[i]->name);
-        print(" ");
+        uint32_t child_id = current_dir->children_id[i];
+        print(fs->file_nodes[child_id].name);
     }
-    print("\n");
 }
 
 void cd(char* path)
 {
     FileSystem* fs = fs_get();
-    Node* current_dir = fs->current_dir;
+    Node* current_dir = &fs->file_nodes[fs->current_dir];
 
     if (strcmp(path, "..") == 0) 
     {
-        if (current_dir->parent != NULL) 
+        if (current_dir->parent_id != NULL) 
         {
-            fs->current_dir = current_dir->parent;
+            fs->current_dir = current_dir->parent_id;
         }
     } 
     else 
     {
+        print_hex(current_dir->child_count);
         for (int i = 0; i < current_dir->child_count; i++) {
-            if (strcmp(current_dir->children[i]->name, path) == 0 && current_dir->children[i]->type == DIR_NODE) {
-                fs->current_dir = current_dir->children[i];
+            if (strcmp(fs->file_nodes[current_dir->children_id[i]].name, path) == 0) {
+                fs->current_dir = current_dir->children_id[i];
+                print("Changed directory to: ");
+                print(fs->current_dir);
                 return;
             }
         }
@@ -49,20 +51,23 @@ void cd(char* path)
 void mkdir(char* name)
 {
     FileSystem* fs = fs_get();
-    Node* current_dir = fs->current_dir;
-    if (current_dir->child_count < 16) 
+    uint32_t current_dir = fs->current_dir;
+    if (fs->file_nodes[current_dir].child_count < 16) 
     {
-        Node* new_dir = (Node*)kmalloc(sizeof(Node));
-        strcpy(new_dir->name, name);
-        new_dir->type = DIR_NODE;
-        new_dir->parent = current_dir;
-        new_dir->child_count = 0;
-        current_dir->children[current_dir->child_count++] = new_dir;
+        Node new_dir; 
+        strcpy(new_dir.name, name);
+        new_dir.size = 0;
+        new_dir.disk_sector = 1; //THIS WILL CHANGE LATER 
+        new_dir.unique_id = fs->uid++;
+        new_dir.parent_id = current_dir;
+        new_dir.child_count = 0;
+        fs->file_nodes[current_dir].children_id[fs->file_nodes[current_dir].child_count++] = new_dir.unique_id;
+        fs->file_nodes[fs->file_count++] = new_dir; // Add the new directory to the file system
     }
 }
 void touch(char* name)
 {
-    FileSystem* fs = fs_get();
+    /*FileSystem* fs = fs_get();
     Node* current_dir = fs->current_dir;
 
     if (current_dir->child_count < 16) {
@@ -72,11 +77,11 @@ void touch(char* name)
         new_file->content = NULL;
         new_file->parent = current_dir;
         current_dir->children[current_dir->child_count++] = new_file;
-    }
+    } */
 }
 void rm(char* name)
 {
-    FileSystem* fs = fs_get();
+    /*FileSystem* fs = fs_get();
     Node* current_dir = fs->current_dir;
 
     for (int i = 0; i < current_dir->child_count; i++) {
@@ -88,7 +93,7 @@ void rm(char* name)
             current_dir->child_count--;
             return;
         }
-    }
+    } */
 }
 
 uint32_t int_to_string(uint32_t num)
@@ -106,11 +111,10 @@ uint32_t int_to_string(uint32_t num)
 }
 void show_directory()
 {
-    FileSystem* fs = fs_get();
-    Node* current_dir = fs->current_dir;
     char buffer[128];
     buffer[0] = '\0';
     fs_get_current_path(buffer);
+    print(buffer);
     vga_write_directory(buffer);
 }
 
